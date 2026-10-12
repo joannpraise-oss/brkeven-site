@@ -1,0 +1,765 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BRK EVEN</title>
+<style>
+  /* Layout concept: a six-stage workflow spine (Connect → Diagnose →
+     Strategize → Create → Analyze → AI Visibility) as an operable tab
+     strip over one content stage; each panel leads with its one key
+     number or decision, detail underneath. */
+  :root{
+    /* Dark app shell — deliberately inverted from the light marketing
+       site, so stepping from "Try the BRK EVEN app" into here reads as
+       crossing into a different, working environment. */
+    --paper:   #172337;
+    --card:    #212E47;
+    --ink:     #FBFAF7;
+    --ink-soft:rgba(251,250,247,.64);
+    --line:    rgba(251,250,247,.14);
+    --night:   #0D1627;
+    --night-ink: #FBFAF7;
+    --night-line: rgba(251,250,247,.14);
+    --blue:    #172337;
+    --blue-ink:#FBFAF7;
+    --accent:  #DAB66E;
+    --accent-ink:#172337;
+    --good:    #2E8B3D;
+    --good-bright: #6FCB7C;
+    --bad:     #C23B3B;
+    --bad-bright: #FF6B6B;
+    --neon-blue: #315CFF;
+    --neon-blue-bright: #7C97FF;
+
+    --font-display:'Archivo', 'Arial Black', sans-serif;
+    --font-body:'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono:'IBM Plex Mono', 'Courier New', monospace;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box}
+  body{
+    background:var(--paper);color:var(--ink);font-family:var(--font-body);
+    font-size:16px;line-height:1.6;padding-inline:clamp(20px,5vw,64px);
+  }
+  img{max-width:100%}
+  h1,h2,h3{font-family:var(--font-display);line-height:1.05;text-wrap:balance;margin:0}
+  p{margin:0}
+  a{color:inherit}
+  .wrap{max-width:1180px;margin-inline:auto}
+  .eyebrow{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--neon-blue-bright)}
+
+  /* ---------- top bar ---------- */
+  header{
+    position:sticky;top:env(safe-area-inset-top,0px);z-index:20;
+    background:var(--paper);border-bottom:1px solid var(--line);
+  }
+  .nav-row{
+    max-width:1180px;margin-inline:auto;display:flex;align-items:center;gap:16px;
+    padding-block:14px;
+  }
+  .logo{font-family:var(--font-display);font-weight:900;font-size:1rem;text-decoration:none;color:var(--ink);white-space:nowrap}
+  .logo span{color:var(--neon-blue-bright)}
+  .back-link{
+    margin-left:auto;font-size:.86rem;font-weight:600;color:var(--ink-soft);text-decoration:none;
+  }
+  .back-link:hover{color:var(--ink)}
+
+  /* ---------- page head ---------- */
+  .page-head{padding-block:clamp(32px,5vw,52px) clamp(20px,3vw,28px)}
+  .page-head h1{font-size:clamp(2rem,3.6vw,2.9rem);font-weight:800;margin-block:.5em .4em}
+  .page-head .lede{max-width:58ch;color:var(--ink-soft);font-size:1rem}
+  .status-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:1.2em}
+
+  .chip{
+    font-family:var(--font-mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;
+    padding:.32em .65em;border-radius:3px;white-space:nowrap;
+  }
+  .chip-dev{background:rgba(251,250,247,.1);color:var(--ink)}
+  .chip-sample{border:1px dashed var(--ink-soft);color:var(--ink-soft)}
+  .chip-on{background:rgba(111,203,124,.16);color:var(--good-bright)}
+  .chip-off{border:1px dashed var(--line);color:var(--ink-soft)}
+  .chip-alert{background:rgba(255,107,107,.16);color:var(--bad-bright)}
+  .chip-live{background:rgba(111,203,124,.16);color:var(--good-bright)}
+  .live-dot{width:7px;height:7px;border-radius:50%;background:var(--good-bright);display:inline-block;margin-left:3px;vertical-align:middle;animation:dot-pulse 2s ease-in-out infinite}
+
+  /* ---------- scroll progress ---------- */
+  .scroll-progress{
+    position:fixed;top:0;left:0;height:3px;width:0%;z-index:60;
+    background:linear-gradient(90deg,var(--neon-blue-bright) 0%,var(--accent) 100%);
+    transition:width .1s linear;
+  }
+
+  /* ---------- scroll reveal ---------- */
+  [data-reveal]{opacity:0;transform:translateY(26px) scale(.98);transition:opacity .6s cubic-bezier(.22,.9,.32,1), transform .6s cubic-bezier(.22,.9,.32,1)}
+  [data-reveal].is-visible{opacity:1;transform:translateY(0) scale(1)}
+
+  .countup{font-variant-numeric:tabular-nums}
+
+  /* ---------- motion ---------- */
+  @keyframes fade-up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes dot-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .page-head>*{animation:fade-up .5s ease both}
+  .tab{transition:color .2s ease, border-color .25s ease, background-color .25s ease, transform .25s cubic-bezier(.34,1.56,.64,1)}
+  .tab:hover{transform:translateX(3px)}
+  .card{transition:transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease, border-color .25s ease}
+  .card:hover{transform:translateY(-4px);box-shadow:0 14px 30px -10px rgba(0,0,0,.4)}
+  .insight-card:hover,.engine-card:hover,.connect-card:hover{border-color:var(--neon-blue-bright)}
+  .insight-card.optimization:hover{border-color:var(--good-bright)}
+  .asset-tile{transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+  .asset-tile:hover{transform:translateY(-4px) scale(1.02)}
+  .btn{transition:background-color .15s ease, color .15s ease, transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease}
+  .btn:hover{transform:translateY(-2px)}
+  .btn.primary:hover{box-shadow:0 10px 24px -6px rgba(218,182,110,.45)}
+  .btn:active{transform:translateY(1px) scale(.96)}
+  .logo{transition:transform .3s cubic-bezier(.34,1.56,.64,1);display:inline-block}
+  .logo:hover{transform:scale(1.05)}
+  section[role="tabpanel"].enter{animation:fade-up .3s ease both}
+  @media (prefers-reduced-motion: reduce){
+    .page-head>*,.live-dot,section[role="tabpanel"].enter{animation:none!important}
+    .card,.btn,.tab,.asset-tile,.logo{transition:none}
+    [data-reveal]{opacity:1!important;transform:none!important;transition:none!important}
+  }
+
+  /* ---------- app shell (sidebar + panels) ---------- */
+  .app-shell{
+    display:grid;grid-template-columns:230px 1fr;gap:clamp(20px,3vw,36px);
+    align-items:start;
+    margin-top:clamp(20px,3vw,28px);
+    padding-top:clamp(20px,3vw,28px);
+    border-top:1px solid var(--line);
+  }
+  .sidebar{
+    display:flex;flex-direction:column;gap:2px;
+    position:sticky;top:calc(env(safe-area-inset-top,0px) + 66px);
+  }
+  .tab{
+    display:flex;align-items:center;gap:.7em;width:100%;text-align:left;
+    font-family:var(--font-body);font-weight:600;font-size:.88rem;color:var(--ink-soft);
+    background:none;border:none;border-left:3px solid transparent;border-radius:0 7px 7px 0;
+    padding:.75em .9em;cursor:pointer;
+  }
+  .tab .n{font-family:var(--font-mono);font-size:.72rem;color:inherit;opacity:.65}
+  .tab svg{width:17px;height:17px;flex-shrink:0}
+  .tab:hover{color:var(--ink);background:rgba(251,250,247,.05)}
+  .tab:focus-visible{outline:2px solid var(--neon-blue-bright);outline-offset:-2px;border-radius:3px}
+  .tab[aria-selected="true"]{color:var(--ink);border-left-color:var(--accent);background:rgba(218,182,110,.09)}
+  .sidebar-note{
+    margin-top:18px;padding:12px 14px;border-top:1px solid var(--line);
+    font-size:.78rem;color:var(--ink-soft);line-height:1.5;
+  }
+
+  .panels{padding-block:0 clamp(48px,6vw,72px);min-width:0}
+  .panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:clamp(20px,3vw,28px)}
+  .panel-head h2{font-size:clamp(1.4rem,2.4vw,1.9rem)}
+  .panel-head .sub{color:var(--ink-soft);max-width:54ch;margin-top:.5em;font-size:.95rem}
+
+  /* ---------- shared card bits ---------- */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:clamp(18px,2.5vw,24px)}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .grid-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+
+  /* connect */
+  .connect-card{display:flex;align-items:center;gap:14px}
+  .connect-card .glyph{
+    width:40px;height:40px;border-radius:8px;background:var(--night);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .connect-card .glyph svg{width:20px;height:20px}
+  .connect-card .meta{min-width:0;flex-grow:1}
+  .connect-card h3{font-size:1rem}
+  .connect-card .chip{margin-top:.4em}
+  .btn{
+    font-family:var(--font-body);font-weight:600;font-size:.82rem;border-radius:5px;
+    padding:.55em 1em;border:1px solid var(--ink);background:none;color:var(--ink);
+    cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;
+  }
+  .btn:hover{background:var(--ink);color:var(--paper)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .btn.primary:hover{background:#c9a35e}
+
+  /* diagnose */
+  .stat-tile{padding:16px;border-radius:8px;background:var(--card);border:1px solid var(--line)}
+  .stat-tile .label{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+  .stat-tile .value{font-family:var(--font-display);font-size:1.7rem;margin-top:.25em;font-variant-numeric:tabular-nums}
+  .stat-tile .delta{font-size:.78rem;margin-top:.2em}
+  .stat-tile .delta.down{color:var(--bad-bright)}
+  .stat-tile .delta.up{color:var(--good-bright)}
+  .callout{
+    background:var(--night);color:var(--night-ink);border-radius:10px;padding:clamp(18px,3vw,26px);
+    margin-top:14px;display:flex;flex-direction:column;gap:10px;
+    border-left:3px solid var(--accent);
+  }
+  .callout .eyebrow{color:var(--accent)}
+  .callout h3{font-size:1.15rem;color:var(--night-ink)}
+  .callout p{color:#C9C8C0;font-size:.92rem;max-width:62ch}
+  .evidence{font-family:var(--font-mono);font-size:.74rem;color:#9A998F;margin-top:4px}
+
+  /* strategize */
+  .plan-item{display:flex;gap:16px;padding-block:16px;border-top:1px solid var(--line)}
+  .plan-item:first-child{border-top:none}
+  .plan-item .idx{font-family:var(--font-mono);color:var(--ink-soft);font-size:.85rem;flex-shrink:0;width:1.6em}
+  .plan-item h3{font-size:1.02rem}
+  .plan-item p{color:var(--ink-soft);font-size:.88rem;margin-top:.35em;max-width:50ch}
+  .tagrow{display:flex;gap:8px;margin-top:.6em}
+
+  /* create */
+  .brief-box{font-family:var(--font-mono);font-size:.85rem;color:var(--ink-soft);background:var(--card);border:1px dashed var(--line);border-radius:8px;padding:14px}
+  .asset-tile{
+    aspect-ratio:4/3;border-radius:8px;display:flex;align-items:flex-end;padding:12px;
+    font-size:.78rem;font-weight:600;color:#fff;position:relative;overflow:hidden;
+  }
+  .asset-tile span{position:relative;z-index:1}
+  .asset-tile.a1{background:linear-gradient(135deg,#3D4CF0,#7C8CFF)}
+  .asset-tile.a2{background:linear-gradient(135deg,#10140A,#2E8B3D)}
+  .asset-tile.a3{background:linear-gradient(135deg,#DAB66E,#B8923E);color:#172337}
+  .asset-tile.a4{background:linear-gradient(135deg,#52514A,#15161C)}
+
+  /* analyze */
+  .analyze-form{max-width:640px}
+  .form-title{font-size:1.05rem;margin-bottom:18px}
+  .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+  .field label{
+    display:block;font-family:var(--font-mono);font-size:.68rem;letter-spacing:.07em;
+    text-transform:uppercase;color:var(--ink-soft);margin-bottom:.6em;
+  }
+  .field input,.field select{
+    width:100%;font-family:var(--font-body);font-size:.95rem;color:var(--ink);
+    background:var(--paper);border:1px solid var(--line);border-radius:6px;
+    padding:.75em .85em;outline:none;
+  }
+  .field input:focus,.field select:focus{border-color:var(--neon-blue-bright);box-shadow:0 0 0 3px rgba(124,151,255,.15)}
+  .analyze-btn{width:100%;justify-content:center;font-size:.9rem;padding:.8em 1em;margin-top:4px}
+  .field-error{display:none;color:var(--bad-bright);font-size:.82rem;margin-top:10px}
+  .field-error.show{display:block}
+
+  .analyze-results{margin-top:clamp(20px,3vw,28px);display:flex;flex-direction:column;gap:16px}
+  .results-top{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+  .results-top h3{font-size:1.15rem}
+  .campaign-tag{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.06em;color:var(--neon-blue-bright)}
+  .analyze-callout p:not(.eyebrow){color:var(--night-ink);font-size:.95rem;max-width:68ch}
+  .analyze-pair{gap:14px}
+  .insight-card{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:clamp(16px,2.5vw,22px);border-left:3px solid var(--neon-blue-bright);
+  }
+  .insight-card p:not(.eyebrow){font-size:.9rem;color:var(--ink-soft);margin-top:.6em}
+  .insight-card.optimization{border-left-color:var(--good-bright)}
+  .insight-card.optimization .eyebrow{color:var(--good-bright)}
+  .confidence-card{padding:clamp(16px,2.5vw,20px)}
+  .confidence-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .confidence-bar{flex-grow:1;min-width:120px;height:8px;border-radius:4px;background:rgba(251,250,247,.1);overflow:hidden}
+  .confidence-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--neon-blue-bright),var(--good-bright));transition:width .4s ease}
+  .confidence-value{font-family:var(--font-display);font-weight:800;color:var(--good-bright);font-size:1.05rem}
+  .metrics-card{padding:clamp(16px,2.5vw,22px)}
+  .metric-list{list-style:none;margin:.8em 0 0;padding:0;display:flex;flex-direction:column;gap:.6em;font-size:.88rem;color:var(--ink)}
+  .metric-list.muted{color:var(--ink-soft)}
+  .metric-list li{font-family:var(--font-mono);font-size:.82rem}
+  .analyze-note{font-size:.8rem;color:var(--ink-soft);max-width:68ch}
+
+  /* AEO/GEO */
+  .engine-card{display:flex;flex-direction:column;gap:10px}
+  .engine-card .top{display:flex;justify-content:space-between;align-items:center}
+  .engine-card .snippet{
+    font-size:.85rem;color:var(--ink-soft);background:var(--paper);border:1px solid var(--line);
+    border-radius:6px;padding:10px 12px;line-height:1.5;
+  }
+  .engine-card .snippet mark{background:rgba(218,182,110,.35);color:var(--ink);padding:0 .15em;border-radius:2px}
+
+  footer{
+    margin-top:clamp(40px,6vw,56px);padding-block:20px calc(20px + env(safe-area-inset-bottom,0px));
+    border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    font-size:.82rem;color:var(--ink-soft);
+  }
+  footer a{font-weight:600;color:var(--ink)}
+
+  @media (max-width:760px){
+    .grid-2,.grid-3{grid-template-columns:1fr}
+    .panel-head{flex-direction:column}
+    .app-shell{grid-template-columns:1fr;border-top:none;padding-top:0}
+    .sidebar{
+      position:static;flex-direction:row;overflow-x:auto;gap:4px;
+      border-top:1px solid var(--line);padding-top:12px;margin-bottom:8px;
+      scrollbar-width:thin;
+    }
+    .tab{
+      white-space:nowrap;flex-shrink:0;border-left:none;border-bottom:3px solid transparent;
+      border-radius:5px 5px 0 0;
+    }
+    .tab[aria-selected="true"]{border-left-color:transparent;border-bottom-color:var(--accent)}
+    .sidebar-note{display:none}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+
+<div class="scroll-progress" id="scroll-progress"></div>
+<header>
+  <div class="nav-row">
+    <a class="logo" href="https://brkeven.com">BRK<span>—</span>EVEN</a>
+    <a class="back-link" href="https://brkeven.com/lab">← Back to the Lab</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="page-head">
+    <p class="eyebrow">BRKEVEN Labs</p>
+    <h1>BRK EVEN</h1>
+    <p class="lede">The closed loop that gets a campaign from "something's off" to "here's proof it's fixed": connect your accounts, spot what needs attention, build a plan, create the assets, find the real cause and measure the fix, then make sure AI search engines know you exist.</p>
+    <div class="status-row">
+      <span class="chip chip-dev">In development</span>
+      <span class="chip chip-sample">Shown with example data</span>
+    </div>
+  </section>
+
+  <div class="app-shell">
+    <div role="tablist" aria-label="BRK EVEN workflow" class="sidebar" id="tabbar">
+      <button class="tab" role="tab" id="tab-connect" aria-controls="panel-connect" aria-selected="true" data-slug="connect">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3M7 10h10l-1 10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1L7 10z"/><path d="M4 10h16"/></svg>
+        <span class="n">01</span> Connect
+      </button>
+      <button class="tab" role="tab" id="tab-diagnose" aria-controls="panel-diagnose" aria-selected="false" tabindex="-1" data-slug="diagnose">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="6.5"/><path d="M15 15L20.5 20.5" stroke-linecap="round"/><path d="M7 10h6M10 7v6" stroke-linecap="round"/></svg>
+        <span class="n">02</span> Diagnose
+      </button>
+      <button class="tab" role="tab" id="tab-strategize" aria-controls="panel-strategize" aria-selected="false" tabindex="-1" data-slug="strategize">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 19l5-11 4 7 3-5 4 9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="n">03</span> Strategize
+      </button>
+      <button class="tab" role="tab" id="tab-create" aria-controls="panel-create" aria-selected="false" tabindex="-1" data-slug="create">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l1.8 4.6L18 9.5l-4.2 1.9L12 16l-1.8-4.6L6 9.5l4.2-1.9L12 3z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8.8-2z"/></svg>
+        <span class="n">04</span> Create
+      </button>
+      <button class="tab" role="tab" id="tab-analyze" aria-controls="panel-analyze" aria-selected="false" tabindex="-1" data-slug="analyze">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V10M12 20V4M20 20v-7" stroke-linecap="round"/></svg>
+        <span class="n">05</span> Analyze <span class="live-dot" title="Live today" aria-hidden="true"></span>
+      </button>
+      <button class="tab" role="tab" id="tab-aeo" aria-controls="panel-aeo" aria-selected="false" tabindex="-1" data-slug="aeo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><path d="M8.5 15.5a5 5 0 0 1 0-7M15.5 15.5a5 5 0 0 0 0-7M5.5 18.5a9 9 0 0 1 0-13M18.5 18.5a9 9 0 0 0 0-13" stroke-linecap="round"/></svg>
+        <span class="n">06</span> AI Visibility
+      </button>
+      <p class="sidebar-note">AEO/GEO tracks whether AI search engines like ChatGPT and Perplexity cite your business.</p>
+    </div>
+
+    <div class="panels">
+
+    <!-- 1 CONNECT -->
+    <section id="panel-connect" role="tabpanel" aria-labelledby="tab-connect">
+      <div class="panel-head">
+        <div>
+          <h2>Connect the places your business lives.</h2>
+          <p class="sub">BRK EVEN reads from these to build every diagnosis that follows. Nothing downstream works without at least an ad account and a storefront or site connected.</p>
+        </div>
+      </div>
+      <div class="grid-auto" data-reveal-group>
+        <div class="card connect-card" data-reveal>
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 20h10M9 14l2.5-3 2 2L17 9" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="meta"><h3>Meta Ads</h3><span class="chip chip-on">Connected</span></div>
+          <span class="btn" aria-disabled="true" title="Coming soon">Manage</span>
+        </div>
+        <div class="card connect-card" data-reveal>
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16M12 4a8 8 0 0 0 0 16"/></svg></div>
+          <div class="meta"><h3>Google Ads</h3><span class="chip chip-off">Not connected</span></div>
+          <span class="btn primary" aria-disabled="true" title="Coming soon">Connect</span>
+        </div>
+        <div class="card connect-card" data-reveal>
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9l2-5h12l2 5M4 9v9a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9M4 9h16"/><path d="M9 13a3 3 0 0 0 6 0" stroke-linecap="round"/></svg></div>
+          <div class="meta"><h3>Shopify Storefront</h3><span class="chip chip-on">Connected</span></div>
+          <span class="btn" aria-disabled="true" title="Coming soon">Manage</span>
+        </div>
+        <div class="card connect-card" data-reveal>
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="meta"><h3>Email / Klaviyo</h3><span class="chip chip-off">Not connected</span></div>
+          <span class="btn primary" aria-disabled="true" title="Coming soon">Connect</span>
+        </div>
+        <div class="card connect-card" data-reveal>
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="7"/><path d="M12 5v7l4 2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="meta"><h3>Google Search Console</h3><span class="chip chip-off">Not connected</span></div>
+          <span class="btn primary" aria-disabled="true" title="Coming soon">Connect</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 DIAGNOSE -->
+    <section id="panel-diagnose" role="tabpanel" aria-labelledby="tab-diagnose" hidden>
+      <div class="panel-head">
+        <div>
+          <h2>A quick read before the deep dive.</h2>
+          <p class="sub">A lightweight scan across everything connected in Connect — enough to know what's worth a closer look. Anything flagged here gets the full root-cause treatment in Analyze.</p>
+        </div>
+      </div>
+      <div class="card" data-reveal>
+        <div class="plan-item">
+          <span class="idx">01</span>
+          <div>
+            <h3>Mobile conversion rate is down sharply</h3>
+            <p>68% below your 90-day average over the last 14 days.</p>
+            <div class="tagrow"><span class="chip chip-alert">Needs attention</span><a href="#analyze" class="btn" style="margin-left:4px">See why →</a></div>
+          </div>
+        </div>
+        <div class="plan-item">
+          <span class="idx">02</span>
+          <div>
+            <h3>Cost per acquisition is trending up</h3>
+            <p>Up 12% week over week — worth watching, not yet urgent.</p>
+            <div class="tagrow"><span class="chip chip-dev">Watch</span></div>
+          </div>
+        </div>
+        <div class="plan-item">
+          <span class="idx">03</span>
+          <div>
+            <h3>Click-through rate is holding steady</h3>
+            <p>In line with your campaign benchmark — no action needed.</p>
+            <div class="tagrow"><span class="chip chip-on">Normal</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 STRATEGIZE -->
+    <section id="panel-strategize" role="tabpanel" aria-labelledby="tab-strategize" hidden>
+      <div class="panel-head">
+        <div>
+          <h2>Three moves, ranked by what they're worth.</h2>
+          <p class="sub">Built directly from the diagnosis — nothing here is a generic best-practice list. You approve before anything ships.</p>
+        </div>
+      </div>
+      <div class="card" data-reveal>
+        <div class="plan-item">
+          <span class="idx">01</span>
+          <div>
+            <h3>Compress checkout page images</h3>
+            <p>Three uncompressed product photos account for 4.1s of the 6.2s mobile load time.</p>
+            <div class="tagrow"><span class="chip chip-on">Impact: High</span><span class="chip chip-sample">Effort: Low</span></div>
+          </div>
+        </div>
+        <div class="plan-item">
+          <span class="idx">02</span>
+          <div>
+            <h3>Add one-tap Shop Pay at checkout</h3>
+            <p>Removes the form-fill step mobile shoppers abandon most often.</p>
+            <div class="tagrow"><span class="chip chip-on">Impact: High</span><span class="chip chip-sample">Effort: Medium</span></div>
+          </div>
+        </div>
+        <div class="plan-item">
+          <span class="idx">03</span>
+          <div>
+            <h3>Retarget cart abandoners within 1 hour</h3>
+            <p>Catches the shoppers lost to the current load-time issue while the fix ships.</p>
+            <div class="tagrow"><span class="chip chip-on">Impact: Medium</span><span class="chip chip-sample">Effort: Low</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 CREATE -->
+    <section id="panel-create" role="tabpanel" aria-labelledby="tab-create" hidden>
+      <div class="panel-head">
+        <div>
+          <h2>Assets built for the plan, not generic templates.</h2>
+          <p class="sub">The brief below was generated from action 03 above; drafts come back for your review before anything publishes.</p>
+        </div>
+      </div>
+      <div class="brief-box" data-reveal>brief: 15s vertical video, UGC style, "come back to your cart" retarget hook, plus 2 static image variants for the same audience</div>
+      <div class="grid-auto" style="margin-top:14px" data-reveal-group>
+        <div class="asset-tile a1" data-reveal><span>Video draft — hook + CTA</span></div>
+        <div class="asset-tile a2" data-reveal><span>Image draft — cart reminder</span></div>
+        <div class="asset-tile a3" data-reveal><span>Image draft — social proof</span></div>
+        <div class="asset-tile a4" data-reveal><span>Caption + hashtag set</span></div>
+      </div>
+    </section>
+
+    <!-- 5 ANALYZE -->
+    <section id="panel-analyze" role="tabpanel" aria-labelledby="tab-analyze" hidden>
+      <div class="panel-head">
+        <div>
+          <h2>Agentic Marketing Analyzer</h2>
+          <p class="sub">BRK EVEN's root-cause engine — the part that's live today. Enter a campaign's numbers below for an instant read.</p>
+        </div>
+        <span class="chip chip-live">Live today</span>
+      </div>
+
+      <div class="card analyze-form">
+        <h3 class="form-title">Campaign data</h3>
+        <div class="field-grid">
+          <div class="field">
+            <label for="az-spend">Ad spend ($) *</label>
+            <input type="number" id="az-spend" min="0" step="1" value="500" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="az-revenue">Revenue generated ($) *</label>
+            <input type="number" id="az-revenue" min="0" step="1" value="2000" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="az-price">Product price ($)</label>
+            <input type="number" id="az-price" min="0" step="1" value="49" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="az-source">Traffic source</label>
+            <select id="az-source">
+              <option>Meta Ads</option>
+              <option>Google Ads</option>
+              <option>TikTok Ads</option>
+              <option>Organic Search</option>
+              <option>Email / Klaviyo</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <button type="button" class="btn primary analyze-btn" id="az-run">Analyze campaign</button>
+        <p class="field-error" id="az-error">Enter an ad spend and revenue figure first.</p>
+      </div>
+
+      <div class="analyze-results" id="az-results" hidden>
+        <div class="results-top">
+          <h3>Analysis results</h3>
+          <span class="campaign-tag" id="az-campaign-tag"></span>
+        </div>
+
+        <div class="callout analyze-callout">
+          <p class="eyebrow">Performance diagnosis</p>
+          <p id="az-diagnosis"></p>
+        </div>
+
+        <div class="grid-2 analyze-pair">
+          <div class="insight-card root-cause">
+            <p class="eyebrow">Root cause</p>
+            <p id="az-root-cause"></p>
+          </div>
+          <div class="insight-card optimization">
+            <p class="eyebrow">Optimization suggestion</p>
+            <p id="az-optimization"></p>
+          </div>
+        </div>
+
+        <div class="card confidence-card">
+          <div class="confidence-row">
+            <span class="eyebrow">Confidence score</span>
+            <div class="confidence-bar"><div class="confidence-fill" id="az-confidence-fill"></div></div>
+            <span class="confidence-value" id="az-confidence-value">80%</span>
+          </div>
+        </div>
+
+        <div class="grid-2 analyze-pair">
+          <div class="card metrics-card">
+            <p class="eyebrow">Metrics used</p>
+            <ul class="metric-list" id="az-metrics-used"></ul>
+          </div>
+          <div class="card metrics-card">
+            <p class="eyebrow">Missing metrics</p>
+            <ul class="metric-list muted" id="az-missing"></ul>
+          </div>
+        </div>
+        <p class="analyze-note">Live analysis from BRK EVEN's model. Each run takes a few seconds and is saved as a campaign.</p>
+      </div>
+    </section>
+
+    <!-- 6 AEO/GEO -->
+    <section id="panel-aeo" role="tabpanel" aria-labelledby="tab-aeo" hidden>
+      <div class="panel-head">
+        <div>
+          <h2>Does AI search already know you exist?</h2>
+          <p class="sub">AEO and GEO — Answer Engine and Generative Engine Optimization — track whether tools like ChatGPT and Perplexity cite your business when someone asks, the way classic SEO tracked Google rankings.</p>
+        </div>
+      </div>
+      <div class="grid-2" data-reveal-group>
+        <div class="card engine-card" data-reveal>
+          <div class="top"><h3>ChatGPT</h3><span class="chip chip-on">Cited</span></div>
+          <p class="snippet">"...for allergen-friendly options, brands like <mark>Hug & Crumb</mark> offer baking mixes formulated without the top eight allergens..."</p>
+        </div>
+        <div class="card engine-card" data-reveal>
+          <div class="top"><h3>Google AI Overviews</h3><span class="chip chip-on">Cited</span></div>
+          <p class="snippet">"...Hug & Crumb's mixes are noted for being <mark>free of common allergens</mark> while staying close to a traditional crumb texture..."</p>
+        </div>
+        <div class="card engine-card" data-reveal>
+          <div class="top"><h3>Perplexity</h3><span class="chip chip-off">Not yet cited</span></div>
+          <p class="snippet">No mention found in the last scan. Usually fixed by a clearer ingredient/FAQ page an answer engine can quote directly.</p>
+        </div>
+        <div class="card engine-card" data-reveal>
+          <div class="top"><h3>Gemini</h3><span class="chip chip-off">Not yet cited</span></div>
+          <p class="snippet">No mention found in the last scan. Re-checked weekly as new pages and reviews go live.</p>
+        </div>
+      </div>
+    </section>
+
+    </div>
+  </div>
+</main>
+
+<footer class="wrap">
+  <span>BRK EVEN's Analyze stage is live today — Connect, Diagnose, Strategize, Create, and AEO/GEO are still in development.</span>
+  <a href="https://brkeven.com/lab">← Back to the Lab</a>
+</footer>
+
+<script>
+(function(){
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var bar = document.getElementById('scroll-progress');
+  if(bar){
+    var ticking = false;
+    function updateBar(){
+      var h = document.documentElement;
+      var scrollTop = h.scrollTop || document.body.scrollTop;
+      var scrollHeight = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+      var pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+      bar.style.width = pct + '%';
+      ticking = false;
+    }
+    window.addEventListener('scroll', function(){
+      if(!ticking){ requestAnimationFrame(updateBar); ticking = true; }
+    }, {passive:true});
+    updateBar();
+  }
+
+  var groups = document.querySelectorAll('[data-reveal-group]');
+  groups.forEach(function(g){
+    var items = g.querySelectorAll('[data-reveal]');
+    items.forEach(function(el, i){ el.style.transitionDelay = (Math.min(i, 8) * 0.08) + 's'; });
+  });
+  var revealTargets = document.querySelectorAll('[data-reveal]');
+  if(reduceMotion || !('IntersectionObserver' in window)){
+    revealTargets.forEach(function(el){ el.classList.add('is-visible'); });
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.15, rootMargin:'0px 0px -40px 0px'});
+    revealTargets.forEach(function(el){ io.observe(el); });
+  }
+})();
+
+(function(){
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  function select(tab, focus){
+    tabs.forEach(function(t){
+      var selected = t === tab;
+      t.setAttribute('aria-selected', selected ? 'true' : 'false');
+      t.tabIndex = selected ? 0 : -1;
+      var panel = document.getElementById(t.getAttribute('aria-controls'));
+      if(panel){
+        panel.hidden = !selected;
+        if(selected){
+          panel.classList.remove('enter');
+          void panel.offsetWidth;
+          panel.classList.add('enter');
+        }
+      }
+    });
+    if(focus) tab.focus();
+  }
+  tabs.forEach(function(tab, i){
+    tab.addEventListener('click', function(){ select(tab, false); });
+    tab.addEventListener('keydown', function(e){
+      var dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if(!dir) return;
+      e.preventDefault();
+      var next = tabs[(i + dir + tabs.length) % tabs.length];
+      select(next, true);
+    });
+  });
+  var fromHash = tabs.filter(function(t){ return t.dataset.slug === location.hash.replace('#',''); })[0];
+  if(fromHash) select(fromHash, false);
+})();
+
+(function(){
+  var runBtn = document.getElementById('az-run');
+  if(!runBtn) return;
+
+  var spendEl = document.getElementById('az-spend');
+  var revenueEl = document.getElementById('az-revenue');
+  var priceEl = document.getElementById('az-price');
+  var sourceEl = document.getElementById('az-source');
+  var errorEl = document.getElementById('az-error');
+  var results = document.getElementById('az-results');
+  var campaignTag = document.getElementById('az-campaign-tag');
+  var diagnosisEl = document.getElementById('az-diagnosis');
+  var rootCauseEl = document.getElementById('az-root-cause');
+  var optimizationEl = document.getElementById('az-optimization');
+  var confFill = document.getElementById('az-confidence-fill');
+  var confValue = document.getElementById('az-confidence-value');
+  var metricsUsedEl = document.getElementById('az-metrics-used');
+
+
+  var missingEl = document.getElementById('az-missing');
+  var API_URL = 'https://agentic-marketing-system-production.up.railway.app/analyze_campaign';
+  var LABEL = runBtn.textContent;
+
+  function fillList(el, items){
+    el.innerHTML = '';
+    (items && items.length ? items : ['None']).forEach(function(t){
+      var li = document.createElement('li'); li.textContent = '→ ' + t; el.appendChild(li);
+    });
+  }
+  function showError(msg){
+    errorEl.textContent = msg;
+    errorEl.classList.add('show');
+  }
+  function messageFor(status, body){
+    var code = body && body.code;
+    if(code === 'ai_busy' || status === 503) return 'The analysis engine is busy right now. Try again in about 30 seconds.';
+    if(status === 504) return 'The analysis took too long. Please try again.';
+    if(status === 400 || status === 422) return (body && typeof body.detail === 'string') ? body.detail : 'Check the numbers you entered and try again.';
+    return 'Something went wrong on our side. Please try again in a moment.';
+  }
+  function animateConfidence(pct){
+    confFill.style.width = pct + '%';
+    confValue.style.color = pct >= 75 ? 'var(--good-bright)' : 'var(--neon-blue-bright)';
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){ confValue.textContent = pct + '%'; return; }
+    var t0 = null;
+    function step(ts){ if(!t0) t0 = ts; var p = Math.min((ts - t0) / 700, 1);
+      confValue.textContent = Math.round(pct * (1 - Math.pow(1 - p, 3))) + '%'; if(p < 1) requestAnimationFrame(step); }
+    requestAnimationFrame(step);
+  }
+
+  runBtn.addEventListener('click', function(){
+    var spend = parseFloat(spendEl.value);
+    var revenue = parseFloat(revenueEl.value);
+    var price = parseFloat(priceEl.value);
+    if(!spend || spend <= 0 || isNaN(revenue) || revenue < 0){
+      showError('Enter an ad spend and revenue figure first.');
+      return;
+    }
+    errorEl.classList.remove('show');
+    var payload = { spend: spend, revenue: revenue, traffic_source: sourceEl.value };
+    if(!isNaN(price) && price > 0) payload.product_price = price;
+
+    runBtn.disabled = true;
+    runBtn.textContent = 'Analyzing…';
+    fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      .then(function(res){
+        return res.json().catch(function(){ return null; }).then(function(body){
+          if(!res.ok) throw { status: res.status, body: body };
+          return body;
+        });
+      })
+      .then(function(data){
+        campaignTag.textContent = 'CAMPAIGN #' + data.campaign_id;
+        diagnosisEl.textContent = data.diagnosis;
+        rootCauseEl.textContent = data.root_cause;
+        optimizationEl.textContent = data.optimization_suggestion;
+        var c = Number(data.confidence_score) || 0;
+        animateConfidence(Math.round(c <= 1 ? c * 100 : c));
+        fillList(metricsUsedEl, data.metrics_used);
+        fillList(missingEl, data.missing_metrics);
+        results.hidden = false;
+        results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      })
+      .catch(function(err){
+        results.hidden = true;
+        showError(err && err.status ? messageFor(err.status, err.body) : 'Couldn’t reach BRK EVEN. Check your connection and try again.');
+      })
+      .then(function(){ runBtn.disabled = false; runBtn.textContent = LABEL; });
+  });
+})();
+</script>
+
+</body>
+</html>

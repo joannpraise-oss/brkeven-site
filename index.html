@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BRKEVEN</title>
+<style>
+  /* Layout concept: one hero branches into three funnels — try the product,
+     work with the studio, read the proof — then the page narrows into how
+     the company is organized (product → studio/labs → philosophy → footer
+     sitemap), so the growing analyzer reads as the lead asset, not a
+     sub-item buried under "Labs". */
+  :root{
+    --paper:   #FBFAF7;
+    --card:    #E9EDF3;
+    --ink:     #172337;
+    --ink-soft:rgba(23,35,55,.62);
+    --line:    rgba(23,35,55,.12);
+    --night:   #172337;
+    --night-ink: #FBFAF7;
+    --night-line: rgba(251,250,247,.14);
+    --blue:    #172337;
+    --blue-ink:#FBFAF7;
+    --highlight: #DAB66E;
+    --highlight-ink: #172337;
+    --good:    #2E8B3D;
+    --good-bright: #6FCB7C;
+    --neon-blue: #315CFF;
+    --neon-blue-bright: #7C97FF;
+    --live:    #2E8B3D;
+    --dev:     #3D4CF0;
+
+    --font-display:'Archivo', 'Arial Black', sans-serif;
+    --font-body:'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono:'IBM Plex Mono', 'Courier New', monospace;
+    color-scheme: light;
+  }
+  *{box-sizing:border-box}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.6;
+    padding-inline:clamp(20px,5vw,64px);
+  }
+  img{max-width:100%}
+  h1,h2,h3{font-family:var(--font-display);line-height:1.04;text-wrap:balance;margin:0}
+  p{margin:0}
+  a{color:inherit}
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:.72rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--neon-blue);
+  }
+  .eyebrow.on-dark{color:var(--highlight)}
+  .wrap{max-width:1180px;margin-inline:auto}
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky;
+    top:env(safe-area-inset-top,0px);
+    z-index:20;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-row{
+    max-width:1180px;margin-inline:auto;
+    display:flex;align-items:center;gap:28px;
+    padding-block:16px;
+    flex-wrap:wrap;
+  }
+  .logo{
+    font-family:var(--font-display);
+    font-weight:900;
+    font-size:1.05rem;
+    letter-spacing:.01em;
+    white-space:nowrap;
+  }
+  .logo span{color:var(--neon-blue)}
+  nav.links{
+    display:flex;gap:22px;flex-wrap:wrap;
+    font-size:.92rem;font-weight:500;
+    margin-right:auto;
+  }
+  nav.links a{text-decoration:none;color:var(--ink-soft)}
+  nav.links a:hover{color:var(--ink)}
+  nav.links a.current{color:var(--ink);font-weight:600}
+  .header-ctas{display:flex;align-items:center;gap:16px;white-space:nowrap}
+  .btn{
+    font-family:var(--font-body);
+    font-weight:600;font-size:.9rem;
+    border-radius:4px;
+    padding:.68em 1.15em;
+    border:1px solid transparent;
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-flex;align-items:center;gap:.5em;
+  }
+  .btn:focus-visible{outline:2px solid var(--highlight);outline-offset:2px}
+  .btn-lime{background:var(--highlight);color:var(--highlight-ink)}
+  .btn-lime:hover{background:#c9a35e}
+  .btn-outline{border-color:var(--ink);color:var(--ink)}
+  .btn-outline:hover{background:var(--ink);color:var(--paper)}
+  .btn-ghost{color:var(--ink-soft);font-weight:500;padding-inline:0}
+  .btn-ghost:hover{color:var(--ink)}
+
+  /* ---------- hero ---------- */
+  .hero{padding-block:clamp(40px,7vw,80px) clamp(28px,5vw,48px)}
+  .hero-grid{
+    display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(24px,5vw,64px);
+    align-items:center;
+  }
+  .hero h1{font-size:clamp(2.4rem,4.4vw,3.9rem);font-weight:800;margin-block:.5em .45em}
+  .hero .lede{max-width:46ch;color:var(--ink-soft);font-size:1.05rem}
+  .hero-ctas{display:flex;gap:14px;flex-wrap:wrap;margin-top:1.8em}
+  .hero-ctas .btn{font-size:.95rem;padding:.85em 1.4em}
+  .hero-note{font-family:var(--font-mono);font-size:.72rem;color:var(--ink-soft);margin-top:.7em;letter-spacing:.02em}
+
+  .orbit{position:relative;width:min(340px,86vw);aspect-ratio:1;margin-inline:auto}
+  .orbit svg{width:100%;height:100%}
+  .orbit-caption{text-align:center;font-family:var(--font-mono);font-size:.72rem;color:var(--ink-soft);margin-top:12px;letter-spacing:.03em}
+
+  /* ---------- ticker ---------- */
+  .ticker{
+    background:var(--night);color:var(--night-ink);
+    margin-top:clamp(24px,5vw,44px);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .ticker-inner{
+    display:flex;gap:2.4em;flex-wrap:wrap;
+    padding:.95em clamp(16px,3vw,28px);
+    font-family:var(--font-mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;
+  }
+  .ticker-inner span::after{content:"•";margin-left:2.4em;opacity:.55}
+  .ticker-inner span:last-child::after{content:""}
+
+  /* ---------- section shell ---------- */
+  section{padding-block:clamp(52px,8vw,96px)}
+  .section-head{
+    display:grid;grid-template-columns:1fr 1.1fr;gap:clamp(20px,4vw,48px);
+    align-items:end;margin-bottom:clamp(28px,4vw,44px);
+  }
+  .section-head h2{font-size:clamp(1.8rem,3vw,2.6rem);margin-top:.4em}
+  .section-head .lede{color:var(--ink-soft);max-width:48ch}
+
+  /* ---------- product spotlight ---------- */
+  .product-panel{
+    background:var(--night);color:var(--night-ink);
+    border-radius:10px;
+    padding:clamp(24px,4vw,44px);
+  }
+  .product-panel .eyebrow{color:var(--highlight)}
+  .product-top{
+    display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(24px,4vw,48px);
+    align-items:start;margin-bottom:clamp(28px,4vw,40px);
+  }
+  .product-top h2{color:var(--night-ink);font-size:clamp(1.7rem,3vw,2.3rem);margin-top:.4em}
+  .product-top p{color:#C9C8C0;max-width:50ch;margin-top:.9em}
+  .proof-stat{
+    border-top:1px solid var(--night-line);padding-top:1em;margin-top:1.6em;
+    display:flex;gap:2.4em;flex-wrap:wrap;
+  }
+  .proof-stat div strong{font-family:var(--font-display);font-size:1.5rem;display:block}
+  .proof-stat div span{font-size:.78rem;color:#9A998F}
+
+  .module-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+  }
+  .module-card{
+    background:var(--night);border:1px solid var(--night-line);border-radius:8px;
+    padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0;
+    text-decoration:none;
+  }
+  .module-card:hover{border-color:var(--highlight)}
+  .module-card .icon{width:28px;height:28px;color:var(--highlight)}
+  .module-card h3{font-size:1rem;color:var(--night-ink)}
+  .module-card p{font-size:.82rem;color:#A5A49B;flex-grow:1}
+  .chip{
+    align-self:flex-start;
+    font-family:var(--font-mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;
+    padding:.3em .6em;border-radius:3px;
+  }
+  .chip-live{background:rgba(111,203,124,.2);color:var(--good-bright)}
+  .chip-dev{background:rgba(125,140,255,.18);color:#9FACFF}
+  .chip-roadmap{background:transparent;color:#8B8A80;border:1px dashed #44433C}
+
+  /* ---------- two ways to build ---------- */
+  .ways-tagline{
+    font-family:var(--font-display);font-weight:800;
+    font-size:clamp(1.3rem,2.6vw,1.9rem);
+    color:var(--ink);max-width:28ch;
+    margin:clamp(20px,3vw,32px) 0 clamp(28px,4vw,40px);
+    padding-top:clamp(20px,3vw,28px);
+    border-top:1px solid var(--line);
+  }
+  .ways-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .way-card{
+    border-radius:10px;padding:clamp(22px,3vw,32px);
+    min-height:260px;display:flex;flex-direction:column;
+  }
+  .way-card.labs{background:var(--night);color:var(--night-ink)}
+  .way-card.studio{background:var(--night);color:var(--night-ink)}
+  .way-card .num{font-family:var(--font-mono);font-size:.78rem;opacity:.75}
+  .way-card .tag{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;margin-top:1.4em}
+  .way-card.labs .tag{color:var(--highlight)}
+  .way-card.studio .tag{color:#EDEFFF}
+  .way-card h3{font-size:clamp(1.3rem,2.2vw,1.65rem);margin-top:.35em;color:#fff}
+  .way-card p{margin-top:.8em;max-width:38ch;opacity:.85;font-size:.94rem}
+  .way-card .btn{margin-top:auto;align-self:flex-start;margin-top:1.6em}
+  .way-card.labs .btn{background:var(--highlight);color:var(--highlight-ink)}
+  .way-card.studio .btn{background:#fff;color:var(--ink)}
+
+  /* ---------- how we think ---------- */
+  .think-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+  .think-item{border-top:2px solid var(--ink);padding-top:16px}
+  .think-item .num{font-family:var(--font-mono);color:var(--ink-soft);font-size:.85rem}
+  .think-item h3{font-size:1.2rem;margin-top:.6em}
+  .think-item p{color:var(--ink-soft);margin-top:.6em;font-size:.95rem}
+
+  .founder{
+    margin-top:clamp(44px,6vw,64px);padding-top:clamp(36px,5vw,52px);
+    border-top:1px solid var(--line);
+    display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:center;
+  }
+  .founder .avatar{
+    width:56px;height:56px;border-radius:50%;background:var(--highlight);
+    display:flex;align-items:center;justify-content:center;color:var(--highlight-ink);
+  }
+  .founder .tag{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .founder p{font-size:clamp(1.1rem,2vw,1.5rem);font-family:var(--font-display);font-weight:700;margin-top:.3em;max-width:34ch}
+  .founder .meet{white-space:nowrap;text-decoration:none;font-weight:600;font-size:.9rem;border-bottom:2px solid var(--ink)}
+
+  /* ---------- cta band ---------- */
+  .cta-band{
+    background:var(--night);color:var(--night-ink);
+    border-radius:10px;
+    padding:clamp(32px,6vw,56px) clamp(28px,6vw,56px);
+    margin-top:clamp(40px,6vw,60px);
+  }
+  .cta-band h2{font-size:clamp(1.7rem,3.4vw,2.5rem);font-weight:800;margin-top:.5em;max-width:18ch}
+  .cta-band .btn{margin-top:1.6em}
+
+  /* ---------- footer ---------- */
+  footer{
+    background:var(--night);color:var(--night-ink);
+    margin-top:clamp(40px,6vw,60px);
+    padding-block:clamp(44px,6vw,64px) calc(28px + env(safe-area-inset-bottom,0px));
+    border-radius:10px 10px 0 0;
+  }
+  .footer-grid{
+    display:grid;grid-template-columns:1.3fr repeat(3,1fr);gap:clamp(24px,4vw,40px);
+  }
+  .footer-logo{font-family:var(--font-display);font-weight:900;font-size:1.2rem}
+  .footer-logo span{color:var(--neon-blue-bright)}
+  footer .blurb{color:#A5A49B;font-size:.92rem;max-width:34ch;margin-top:1em}
+  footer .col h4{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:#8B8A80;margin-bottom:1em}
+  footer .col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.7em}
+  footer .col a{text-decoration:none;color:#D8D7CE;font-size:.92rem}
+  footer .col a:hover{color:var(--highlight)}
+  .footer-bottom{
+    margin-top:clamp(36px,5vw,52px);padding-top:20px;border-top:1px solid var(--night-line);
+    display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    font-size:.78rem;color:#716F66;
+  }
+
+  /* ---------- scroll progress ---------- */
+  .scroll-progress{
+    position:fixed;top:0;left:0;height:3px;width:0%;z-index:60;
+    background:linear-gradient(90deg,var(--neon-blue) 0%,var(--highlight) 100%);
+    transition:width .1s linear;
+  }
+
+  /* ---------- scroll reveal ---------- */
+  [data-reveal]{opacity:0;transform:translateY(30px) scale(.98);transition:opacity .7s cubic-bezier(.22,.9,.32,1), transform .7s cubic-bezier(.22,.9,.32,1)}
+  [data-reveal].is-visible{opacity:1;transform:translateY(0) scale(1)}
+
+  /* ---------- count-up ---------- */
+  .countup{font-variant-numeric:tabular-nums}
+
+  /* ---------- motion ---------- */
+  @keyframes fade-up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes orbit-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  @keyframes orbit-spin-rev{from{transform:rotate(360deg)}to{transform:rotate(0deg)}}
+  @keyframes pulse-ring{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.55);opacity:0}}
+  @keyframes dot-pulse{0%,100%{opacity:1}50%{opacity:.42}}
+  @keyframes core-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+
+  .hero-grid>div:first-child{animation:fade-up .6s ease both}
+  .hero-grid>div:last-child{animation:fade-up .6s .15s ease both}
+  .ticker{animation:fade-up .5s .25s ease both}
+
+  .orbit-dot{transform-origin:150px 150px}
+  .orbit-dot.outer{animation:orbit-spin 18s linear infinite}
+  .orbit-dot.mid{animation:orbit-spin-rev 11s linear infinite}
+  .orbit-dot.core-fast{animation:orbit-spin 6s linear infinite}
+  .pulse-ring{transform-origin:150px 150px;opacity:.5;animation:pulse-ring 3.4s ease-out infinite}
+  .pulse-ring.ring-b{animation-delay:1.7s}
+  .orbit-core{transform-origin:150px 150px;animation:core-breathe 4s ease-in-out infinite}
+  .orbit-sweep{transform-origin:150px 150px;animation:orbit-spin 7s linear infinite}
+
+  .module-card,.way-card,.lab-card{transition:transform .35s cubic-bezier(.34,1.56,.64,1), border-color .25s ease, box-shadow .35s ease}
+  .module-card:hover,.way-card:hover{transform:translateY(-6px) scale(1.015)}
+  .module-card:hover{border-color:var(--highlight);box-shadow:0 14px 32px -10px rgba(218,182,110,.35)}
+  .way-card:hover{box-shadow:0 16px 36px -10px rgba(0,0,0,.28)}
+  .chip-live{animation:dot-pulse 2.4s ease-in-out infinite}
+  .btn{transition:background-color .15s ease, color .15s ease, transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-lime:hover{box-shadow:0 10px 24px -6px rgba(218,182,110,.5)}
+  .btn:active{transform:translateY(1px) scale(.96)}
+  .logo{transition:transform .3s cubic-bezier(.34,1.56,.64,1);display:inline-block}
+  .logo:hover{transform:scale(1.05)}
+
+  @media (prefers-reduced-motion: reduce){
+    .hero-grid>div,.ticker,.orbit-dot,.pulse-ring,.chip-live,.orbit-core,.orbit-sweep{animation:none!important}
+    .module-card,.way-card,.btn,.logo{transition:none}
+    [data-reveal]{opacity:1!important;transform:none!important;transition:none!important}
+  }
+
+  @media (max-width:860px){
+    .nav-row{gap:16px}
+    nav.links{order:3;width:100%;gap:16px 20px}
+    .hero-grid{grid-template-columns:1fr}
+    .orbit{order:-1}
+    .section-head{grid-template-columns:1fr}
+    .product-top{grid-template-columns:1fr}
+    .module-grid{grid-template-columns:1fr 1fr}
+    .ways-grid{grid-template-columns:1fr}
+    .think-grid{grid-template-columns:1fr}
+    .founder{grid-template-columns:48px 1fr;row-gap:14px}
+    .founder .meet{grid-column:2}
+    .footer-grid{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:480px){
+    .module-grid{grid-template-columns:1fr}
+    .footer-grid{grid-template-columns:1fr}
+    .proof-stat{gap:1.6em}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+
+<div class="scroll-progress" id="scroll-progress"></div>
+<header>
+  <div class="nav-row">
+    <div class="logo">BRK<span>—</span>EVEN</div>
+    <nav class="links">
+      <a href="#product" class="current">Product</a>
+      <a href="#ways">Studio</a>
+      <a href="lab.html">Labs</a>
+    </nav>
+    <div class="header-ctas">
+      <a href="https://app.brkeven.com" class="btn btn-ghost">Log in</a>
+      <a href="https://app.brkeven.com" class="btn btn-lime">Try the BRK EVEN app</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow">AI Venture + Product Studio</p>
+        <h1>We build intelligent businesses and help others build theirs.</h1>
+        <p class="lede">BRKEVEN creates useful AI products, develops new ventures, and helps teams turn ambitious ideas into products people can trust and use.</p>
+        <div class="hero-ctas">
+          <a href="#product" class="btn btn-lime">Try the BRK EVEN app — free</a>
+          <a href="contact.html" class="btn btn-outline">Work with the Studio</a>
+        </div>
+        <p class="hero-note">NO CARD REQUIRED — FIRST DIAGNOSTIC RUNS IN UNDER 2 MINUTES</p>
+      </div>
+      <div>
+        <div class="orbit">
+          <svg viewBox="0 0 300 300" aria-hidden="true">
+            <defs>
+              <linearGradient id="sweepGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#DAB66E"/>
+                <stop offset="100%" stop-color="#315CFF"/>
+              </linearGradient>
+            </defs>
+            <circle cx="150" cy="150" r="140" fill="none" stroke="#B9B6A6" stroke-width="1" stroke-dasharray="2 7"/>
+            <circle class="orbit-sweep" cx="150" cy="150" r="140" fill="none" stroke="url(#sweepGrad)" stroke-width="2" stroke-linecap="round" stroke-dasharray="60 820"/>
+            <circle cx="150" cy="150" r="98" fill="none" stroke="#9FA6E8" stroke-width="1.2" stroke-dasharray="3 6"/>
+            <circle class="pulse-ring" cx="150" cy="150" r="58" fill="none" stroke="#DAB66E" stroke-width="2"/>
+            <circle class="pulse-ring ring-b" cx="150" cy="150" r="58" fill="none" stroke="#315CFF" stroke-width="2"/>
+            <circle class="orbit-core" cx="150" cy="150" r="58" fill="#172337"/>
+            <text x="150" y="146" text-anchor="middle" font-family="IBM Plex Mono" font-weight="500" font-size="15" fill="#fff" letter-spacing="1">BRK</text>
+            <text x="150" y="164" text-anchor="middle" font-family="IBM Plex Mono" font-weight="500" font-size="15" fill="#fff" letter-spacing="1">EVEN</text>
+            <text x="150" y="30" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#6B6A62" letter-spacing="2">IDEAS</text>
+            <text x="150" y="276" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#6B6A62" letter-spacing="2">SYSTEMS</text>
+            <g class="orbit-dot outer">
+              <circle cx="150" cy="10" r="4" fill="#DAB66E"/>
+              <circle cx="145" cy="16" r="2.6" fill="#DAB66E" opacity=".5"/>
+              <circle cx="141" cy="22" r="1.6" fill="#DAB66E" opacity=".25"/>
+            </g>
+            <g class="orbit-dot mid">
+              <circle cx="150" cy="52" r="3.2" fill="#315CFF"/>
+              <circle cx="146" cy="57" r="2" fill="#315CFF" opacity=".5"/>
+            </g>
+            <g class="orbit-dot core-fast"><circle cx="150" cy="98" r="2.2" fill="#FBFAF7"/></g>
+          </svg>
+        </div>
+        <p class="orbit-caption">Technology with judgment at the center.</p>
+      </div>
+    </div>
+
+    <div class="ticker">
+      <div class="ticker-inner">
+        <span>AI Products</span><span>Diagnostics</span><span>Venture Building</span><span>Evaluation</span><span>Product Leadership</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="product">
+    <div class="product-panel">
+      <div class="product-top" data-reveal-group>
+        <div data-reveal>
+          <p class="eyebrow on-dark">BRKEVEN Product</p>
+          <h2>BRK EVEN: how it works.</h2>
+        </div>
+        <div data-reveal>
+          <p>One closed loop, six stages: connect your accounts, catch what's worth a closer look, build a plan, create the assets, find the real cause and prove the fix, then check your AI search visibility. Analyze is live today — the rest is shipping around it.</p>
+          <div class="proof-stat" data-reveal-group>
+            <div data-reveal><strong><span class="countup" data-countup data-target="1">0</span> / 6</strong><span>Stages live today</span></div>
+            <div data-reveal><strong><span class="countup" data-countup data-target="24">0</span>/7</strong><span>Always-on diagnostics</span></div>
+            <div data-reveal><strong><span class="countup" data-countup data-target="2">0</span> min</strong><span>To your first report</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="module-grid" data-reveal-group>
+        <a class="module-card" data-reveal href="https://app.brkeven.com/#connect">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3M7 10h10l-1 10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1L7 10z"/><path d="M4 10h16"/></svg>
+          <span class="chip chip-dev">In development</span>
+          <h3>01 Connect</h3>
+          <p>Link ad accounts, storefront, and email so every diagnosis runs on real data.</p>
+        </a>
+        <a class="module-card" data-reveal href="https://app.brkeven.com/#diagnose">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="6.5"/><path d="M15 15L20.5 20.5" stroke-linecap="round"/><path d="M7 10h6M10 7v6" stroke-linecap="round"/></svg>
+          <span class="chip chip-dev">In development</span>
+          <h3>02 Diagnose</h3>
+          <p>A quick scan flags what's worth a closer look before the deep dive.</p>
+        </a>
+        <a class="module-card" data-reveal href="https://app.brkeven.com/#strategize">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19l5-11 4 7 3-5 4 9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="chip chip-dev">In development</span>
+          <h3>03 Strategize</h3>
+          <p>Turns a diagnosis into a ranked, approvable plan — not an autopilot.</p>
+        </a>
+        <a class="module-card" data-reveal href="https://app.brkeven.com/#create">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l1.8 4.6L18 9.5l-4.2 1.9L12 16l-1.8-4.6L6 9.5l4.2-1.9L12 3z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8.8-2z"/></svg>
+          <span class="chip chip-roadmap">Roadmap</span>
+          <h3>04 Create</h3>
+          <p>Drafts the video and image assets the strategy calls for, ready for review.</p>
+        </a>
+        <a class="module-card" data-reveal href="https://app.brkeven.com/#analyze">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 20V10M12 20V4M20 20v-7" stroke-linecap="round"/></svg>
+          <span class="chip chip-live">Live</span>
+          <h3>05 Analyze</h3>
+          <p>Root-causes traffic, CTR, and conversion drop-offs, then proves the fix.</p>
+        </a>
+        <a class="module-card" data-reveal href="https://app.brkeven.com/#aeo">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><path d="M8.5 15.5a5 5 0 0 1 0-7M15.5 15.5a5 5 0 0 0 0-7M5.5 18.5a9 9 0 0 1 0-13M18.5 18.5a9 9 0 0 0 0-13" stroke-linecap="round"/></svg>
+          <span class="chip chip-roadmap">Roadmap</span>
+          <h3>06 AI Visibility</h3>
+          <p>Checks whether ChatGPT, Perplexity, and Google AI already cite the business.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="ways">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">How the company works</p>
+        <h2>Beyond the product, two ways to build with us.</h2>
+      </div>
+      <p class="lede">BRKEVEN brings product judgment, technical depth, and a bias toward useful outcomes to both. We simplify the mechanics while preserving the human context that makes a product worth building.</p>
+    </div>
+    <p class="ways-tagline" data-reveal>Our ideas live in the Lab. Your ideas take shape in the Studio.</p>
+    <div class="ways-grid" data-reveal-group>
+      <div class="way-card labs" data-reveal>
+        <span class="num">01</span>
+        <span class="tag">BRKEVEN Labs</span>
+        <h3>Where our own ideas are explored, tested, and built.</h3>
+        <p>Products, prototypes, and experiments moving from early signal toward useful businesses — the Analyzer started here.</p>
+        <a href="lab.html" class="btn">Inside the Lab</a>
+      </div>
+      <div class="way-card studio" data-reveal>
+        <span class="num">02</span>
+        <span class="tag">BRKEVEN Studio</span>
+        <h3>Focused product leadership for consequential ideas.</h3>
+        <p>From discovery and MVP definition to AI evaluation, governance, and launch.</p>
+        <a href="contact.html" class="btn">Work with the Studio</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">How we think</p>
+        <h2>Three habits behind every build.</h2>
+      </div>
+    </div>
+    <div class="think-grid" data-reveal-group>
+      <div class="think-item" data-reveal>
+        <p class="num">01</p>
+        <h3>Find the friction.</h3>
+        <p>Look for the complexity consuming time without creating meaning.</p>
+      </div>
+      <div class="think-item" data-reveal>
+        <p class="num">02</p>
+        <h3>Simplify the system.</h3>
+        <p>Standardize, automate, combine, or redesign what gets in the way.</p>
+      </div>
+      <div class="think-item" data-reveal>
+        <p class="num">03</p>
+        <h3>Preserve judgment.</h3>
+        <p>Keep people close to the decisions where context and care matter.</p>
+      </div>
+    </div>
+
+    <div class="founder" data-reveal>
+      <div class="avatar">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3"/></svg>
+      </div>
+      <div>
+        <p class="tag">Founder-led</p>
+        <p>Built on a decade of turning complex, manual systems into simpler, more intelligent ones.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="cta-band" data-reveal>
+      <p class="eyebrow on-dark">A thoughtful place to begin</p>
+      <h2>If you have something worth building, let's talk.</h2>
+      <a href="contact.html" class="btn btn-lime">Start a conversation <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">BRK<span>—</span>EVEN</div>
+        <p class="blurb">Building intelligent businesses and helping others build theirs.</p>
+      </div>
+      <div class="col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#product">How it works</a></li>
+          <li><a href="https://app.brkeven.com/#analyze">Analyze (live)</a></li>
+          <li><a href="#product">Roadmap</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#ways">Studio</a></li>
+          <li><a href="lab.html">Labs</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="contact.html">Start a conversation</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 BRKEVEN</span>
+      <span>Built with intention.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* scroll progress bar */
+  var bar = document.getElementById('scroll-progress');
+  if(bar){
+    var ticking = false;
+    function updateBar(){
+      var h = document.documentElement;
+      var scrollTop = h.scrollTop || document.body.scrollTop;
+      var scrollHeight = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+      var pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+      bar.style.width = pct + '%';
+      ticking = false;
+    }
+    window.addEventListener('scroll', function(){
+      if(!ticking){ requestAnimationFrame(updateBar); ticking = true; }
+    }, {passive:true});
+    updateBar();
+  }
+
+  /* scroll reveal */
+  var groups = document.querySelectorAll('[data-reveal-group]');
+  groups.forEach(function(g){
+    var items = g.querySelectorAll('[data-reveal]');
+    items.forEach(function(el, i){ el.style.transitionDelay = (Math.min(i, 8) * 0.08) + 's'; });
+  });
+  var revealTargets = document.querySelectorAll('[data-reveal]');
+  if(reduceMotion || !('IntersectionObserver' in window)){
+    revealTargets.forEach(function(el){ el.classList.add('is-visible'); });
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.15, rootMargin:'0px 0px -40px 0px'});
+    revealTargets.forEach(function(el){ io.observe(el); });
+  }
+
+  /* count-up numbers */
+  function animateCount(el, target, decimals){
+    if(reduceMotion){ el.textContent = decimals ? target.toFixed(decimals) : target; return; }
+    var dur = 1100, startTime = null;
+    function step(ts){
+      if(!startTime) startTime = ts;
+      var p = Math.min((ts - startTime) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      var val = target * eased;
+      el.textContent = decimals ? val.toFixed(decimals) : Math.round(val);
+      if(p < 1) requestAnimationFrame(step);
+      else el.textContent = decimals ? target.toFixed(decimals) : target;
+    }
+    requestAnimationFrame(step);
+  }
+  var countEls = document.querySelectorAll('[data-countup]');
+  if('IntersectionObserver' in window){
+    var countIo = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          var el = entry.target;
+          var target = parseFloat(el.getAttribute('data-target'));
+          var decimals = parseInt(el.getAttribute('data-decimals') || '0', 10);
+          animateCount(el, target, decimals);
+          countIo.unobserve(el);
+        }
+      });
+    }, {threshold:0.4});
+    countEls.forEach(function(el){ countIo.observe(el); });
+  } else {
+    countEls.forEach(function(el){ el.textContent = el.getAttribute('data-target'); });
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Contact — BRK EVEN</title>
+<style>
+  /* Layout concept: one short, honest form on a page of its own — no
+     visible email address anywhere in the markup. Submissions route
+     through Formspree, which forwards to Joann's inbox without ever
+     putting the address in the page source. */
+  :root{
+    --paper:   #FBFAF7;
+    --card:    #E9EDF3;
+    --ink:     #172337;
+    --ink-soft:rgba(23,35,55,.62);
+    --line:    rgba(23,35,55,.12);
+    --night:   #172337;
+    --night-ink: #FBFAF7;
+    --night-line: rgba(251,250,247,.14);
+    --blue:    #172337;
+    --blue-ink:#FBFAF7;
+    --highlight: #DAB66E;
+    --highlight-ink: #172337;
+    --good:    #2E8B3D;
+    --good-bright: #6FCB7C;
+    --bad:     #C23B3B;
+    --neon-blue: #315CFF;
+    --neon-blue-bright: #7C97FF;
+
+    --font-display:'Archivo', 'Arial Black', sans-serif;
+    --font-body:'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono:'IBM Plex Mono', 'Courier New', monospace;
+    color-scheme: light;
+  }
+  *{box-sizing:border-box}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.6;
+    padding-inline:clamp(20px,5vw,64px);
+  }
+  img{max-width:100%}
+  h1,h2,h3{font-family:var(--font-display);line-height:1.04;text-wrap:balance;margin:0}
+  p{margin:0}
+  a{color:inherit}
+  .eyebrow{
+    font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--neon-blue);
+  }
+  .wrap{max-width:1180px;margin-inline:auto}
+
+  /* ---------- header (shared with home) ---------- */
+  header{
+    position:sticky;top:env(safe-area-inset-top,0px);z-index:20;
+    background:var(--paper);border-bottom:1px solid var(--line);
+  }
+  .nav-row{
+    max-width:1180px;margin-inline:auto;display:flex;align-items:center;gap:28px;
+    padding-block:16px;flex-wrap:wrap;
+  }
+  .logo{font-family:var(--font-display);font-weight:900;font-size:1.05rem;white-space:nowrap;text-decoration:none;color:var(--ink)}
+  .logo span{color:var(--neon-blue)}
+  nav.links{display:flex;gap:22px;flex-wrap:wrap;font-size:.92rem;font-weight:500;margin-right:auto}
+  nav.links a{text-decoration:none;color:var(--ink-soft)}
+  nav.links a:hover{color:var(--ink)}
+  nav.links a.current{color:var(--ink);font-weight:600}
+  .header-ctas{display:flex;align-items:center;gap:16px;white-space:nowrap}
+  .btn{
+    font-family:var(--font-body);font-weight:600;font-size:.9rem;border-radius:4px;
+    padding:.68em 1.15em;border:1px solid transparent;cursor:pointer;text-decoration:none;
+    display:inline-flex;align-items:center;gap:.5em;
+  }
+  .btn:focus-visible{outline:2px solid var(--highlight);outline-offset:2px}
+  .btn-lime{background:var(--highlight);color:var(--highlight-ink)}
+  .btn-lime:hover{background:#c9a35e}
+  .btn-lime:disabled{opacity:.6;cursor:default}
+  .btn-outline{border-color:var(--ink);color:var(--ink)}
+  .btn-outline:hover{background:var(--ink);color:var(--paper)}
+  .btn-ghost{color:var(--ink-soft);font-weight:500;padding-inline:0}
+  .btn-ghost:hover{color:var(--ink)}
+
+  /* ---------- page head ---------- */
+  .page-head{padding-block:clamp(40px,7vw,72px) clamp(8px,2vw,16px)}
+  .page-head h1{font-size:clamp(2.2rem,4vw,3.4rem);font-weight:800;margin-block:.5em .4em;max-width:18ch}
+  .page-head .lede{max-width:56ch;color:var(--ink-soft);font-size:1.05rem}
+
+  /* ---------- contact section ---------- */
+  .contact-wrap{
+    padding-block:clamp(28px,4vw,48px) clamp(56px,8vw,96px);
+    display:grid;grid-template-columns:1fr 1.3fr;gap:clamp(28px,4vw,56px);
+    align-items:start;
+  }
+  .contact-side{padding-top:6px}
+  .contact-side .note{font-size:.95rem;color:var(--ink-soft);max-width:38ch}
+  .contact-side .expect{margin-top:28px;border-top:1px solid var(--line);padding-top:20px;display:flex;flex-direction:column;gap:14px}
+  .contact-side .expect-item{display:flex;gap:12px;align-items:flex-start}
+  .contact-side .expect-item .dot{width:7px;height:7px;border-radius:50%;background:var(--neon-blue);margin-top:.55em;flex-shrink:0}
+  .contact-side .expect-item p{font-size:.92rem;color:var(--ink-soft)}
+
+  .contact-card{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:clamp(24px,3.5vw,36px);
+  }
+  .field{margin-bottom:18px}
+  .field label{
+    display:block;font-family:var(--font-mono);font-size:.7rem;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--ink-soft);margin-bottom:.6em;
+  }
+  .field input,.field textarea{
+    width:100%;font-family:var(--font-body);font-size:1rem;color:var(--ink);
+    background:var(--paper);border:1px solid var(--line);border-radius:6px;
+    padding:.8em .9em;outline:none;
+  }
+  .field input:focus,.field textarea:focus{border-color:var(--neon-blue);box-shadow:0 0 0 3px rgba(49,92,255,.12)}
+  .field textarea{resize:vertical;min-height:120px}
+  .form-foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:6px}
+  .form-note{font-size:.82rem;color:var(--ink-soft)}
+  .form-error{font-size:.86rem;color:var(--bad);margin-top:10px;display:none}
+  .form-error.show{display:block}
+
+  .success-panel{display:none;text-align:center;padding-block:28px}
+  .success-panel.show{display:block}
+  .success-panel .check{
+    width:44px;height:44px;border-radius:50%;background:rgba(46,139,61,.12);color:var(--good);
+    display:flex;align-items:center;justify-content:center;margin-inline:auto;margin-bottom:16px;
+  }
+  .success-panel h3{font-size:1.2rem;margin-bottom:.5em}
+  .success-panel p{color:var(--ink-soft);font-size:.95rem}
+  .contact-card.sent .form-body{display:none}
+
+  /* ---------- footer (shared with home) ---------- */
+  footer{
+    background:var(--night);color:var(--night-ink);margin-top:clamp(40px,6vw,60px);
+    padding-block:clamp(44px,6vw,64px) calc(28px + env(safe-area-inset-bottom,0px));
+    border-radius:10px 10px 0 0;
+  }
+  .footer-grid{display:grid;grid-template-columns:1.3fr repeat(3,1fr);gap:clamp(24px,4vw,40px)}
+  .footer-logo{font-family:var(--font-display);font-weight:900;font-size:1.2rem}
+  .footer-logo span{color:var(--neon-blue-bright)}
+  footer .blurb{color:#A5A49B;font-size:.92rem;max-width:34ch;margin-top:1em}
+  footer .col h4{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:#8B8A80;margin-bottom:1em}
+  footer .col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.7em}
+  footer .col a{text-decoration:none;color:#D8D7CE;font-size:.92rem}
+  footer .col a:hover{color:var(--highlight)}
+  .footer-bottom{
+    margin-top:clamp(36px,5vw,52px);padding-top:20px;border-top:1px solid var(--night-line);
+    display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.78rem;color:#716F66;
+  }
+
+  /* ---------- scroll progress ---------- */
+  .scroll-progress{
+    position:fixed;top:0;left:0;height:3px;width:0%;z-index:60;
+    background:linear-gradient(90deg,var(--neon-blue) 0%,var(--highlight) 100%);
+    transition:width .1s linear;
+  }
+
+  /* ---------- scroll reveal ---------- */
+  [data-reveal]{opacity:0;transform:translateY(24px);transition:opacity .6s cubic-bezier(.22,.9,.32,1), transform .6s cubic-bezier(.22,.9,.32,1)}
+  [data-reveal].is-visible{opacity:1;transform:translateY(0)}
+
+  /* ---------- motion ---------- */
+  @keyframes fade-up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  .page-head>*,.contact-side>.note,.contact-card{animation:fade-up .55s ease both}
+  .btn{transition:background-color .15s ease, color .15s ease, transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-lime:hover{box-shadow:0 10px 24px -6px rgba(218,182,110,.5)}
+  .btn:active{transform:translateY(1px) scale(.96)}
+  .logo{transition:transform .3s cubic-bezier(.34,1.56,.64,1);display:inline-block}
+  .logo:hover{transform:scale(1.05)}
+  .contact-card{transition:transform .3s ease, box-shadow .3s ease}
+  .contact-card:hover{box-shadow:0 16px 34px -12px rgba(23,35,55,.18)}
+
+  @media (prefers-reduced-motion: reduce){
+    .page-head>*,.contact-side>.note,.contact-card{animation:none!important}
+    .btn,.logo,.contact-card{transition:none}
+    [data-reveal]{opacity:1!important;transform:none!important;transition:none!important}
+  }
+
+  @media (max-width:860px){
+    .nav-row{gap:16px}
+    nav.links{order:3;width:100%;gap:16px 20px}
+    .contact-wrap{grid-template-columns:1fr}
+    .footer-grid{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:480px){
+    .footer-grid{grid-template-columns:1fr}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+
+<div class="scroll-progress" id="scroll-progress"></div>
+<header>
+  <div class="nav-row">
+    <a class="logo" href="index.html">BRK<span>—</span>EVEN</a>
+    <nav class="links">
+      <a href="index.html#product">Product</a>
+      <a href="index.html#ways">Studio</a>
+      <a href="lab.html">Labs</a>
+    </nav>
+    <div class="header-ctas">
+      <a href="https://app.brkeven.com" class="btn btn-ghost">Log in</a>
+      <a href="https://app.brkeven.com" class="btn btn-lime">Try the BRK EVEN app</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="page-head">
+    <p class="eyebrow">A thoughtful place to begin</p>
+    <h1>If you have something worth building, let's talk.</h1>
+    <p class="lede">Tell me a little about what you're working on — a product idea, a process that's outgrown itself, a team that needs a build partner. I read every message myself.</p>
+  </section>
+
+  <section class="contact-wrap">
+    <div class="contact-side">
+      <p class="note">This goes straight to Joann — no account, no gatekeeping. Expect a reply within a couple of business days.</p>
+      <div class="expect" data-reveal-group>
+        <div class="expect-item" data-reveal>
+          <span class="dot"></span>
+          <p>Say what stage you're at — an idea, a working prototype, or something already live.</p>
+        </div>
+        <div class="expect-item" data-reveal>
+          <span class="dot"></span>
+          <p>Studio and Labs inquiries both land here; mention which one fits, if you know.</p>
+        </div>
+        <div class="expect-item" data-reveal>
+          <span class="dot"></span>
+          <p>Prefer not to use a form at all? Mention that and we'll find another way.</p>
+        </div>
+      </div>
+    </div>
+
+    <!--
+      Form backend: this uses Formspree (formspree.io) so the destination
+      inbox never appears in the page source. To wire it up for real:
+        1. Create a free Formspree account and a new form.
+        2. Set the form's notification address to the private inbox.
+        3. Replace YOUR_FORM_ID below with the ID Formspree gives you.
+      Until that's done, the form will show its error state on submit.
+    -->
+    <div class="contact-card" id="contact-card">
+      <form id="contact-form" class="form-body" action="https://formspree.io/f/xvkzblne" method="POST">
+        <div class="field">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="email">Your email</label>
+          <input type="email" id="email" name="email" required autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" required placeholder="What are you building, and where are you stuck?"></textarea>
+        </div>
+        <input type="hidden" name="_subject" value="New message from the BRK EVEN site">
+        <div class="form-foot">
+          <button type="submit" class="btn btn-lime" id="submit-btn">Send message</button>
+          <span class="form-note">Usually a reply within 2 business days.</span>
+        </div>
+        <p class="form-error" id="form-error">Something went wrong sending that — try again, or give it a moment and retry.</p>
+      </form>
+      <div class="success-panel" id="success-panel">
+        <div class="check">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+        </div>
+        <h3>Message sent.</h3>
+        <p>Thanks for reaching out — expect a reply within a couple of business days.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">BRK<span>—</span>EVEN</div>
+        <p class="blurb">Building intelligent businesses and helping others build theirs.</p>
+      </div>
+      <div class="col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="index.html#product">How it works</a></li>
+          <li><a href="https://app.brkeven.com/#analyze">Analyze (live)</a></li>
+          <li><a href="index.html#product">Roadmap</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="index.html#ways">Studio</a></li>
+          <li><a href="lab.html">Labs</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="contact.html" class="current">Start a conversation</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 BRKEVEN</span>
+      <span>Built with intention.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var bar = document.getElementById('scroll-progress');
+    if(bar){
+      var ticking = false;
+      function updateBar(){
+        var h = document.documentElement;
+        var scrollTop = h.scrollTop || document.body.scrollTop;
+        var scrollHeight = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+        var pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        bar.style.width = pct + '%';
+        ticking = false;
+      }
+      window.addEventListener('scroll', function(){
+        if(!ticking){ requestAnimationFrame(updateBar); ticking = true; }
+      }, {passive:true});
+      updateBar();
+    }
+
+    var groups = document.querySelectorAll('[data-reveal-group]');
+    groups.forEach(function(g){
+      var items = g.querySelectorAll('[data-reveal]');
+      items.forEach(function(el, i){ el.style.transitionDelay = (Math.min(i, 8) * 0.08) + 's'; });
+    });
+    var revealTargets = document.querySelectorAll('[data-reveal]');
+    if(reduceMotion || !('IntersectionObserver' in window)){
+      revealTargets.forEach(function(el){ el.classList.add('is-visible'); });
+    } else {
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting){
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, {threshold:0.15, rootMargin:'0px 0px -40px 0px'});
+      revealTargets.forEach(function(el){ io.observe(el); });
+    }
+  })();
+
+  (function(){
+    var form = document.getElementById('contact-form');
+    var card = document.getElementById('contact-card');
+    var successPanel = document.getElementById('success-panel');
+    var errorMsg = document.getElementById('form-error');
+    var submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      errorMsg.classList.remove('show');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending…';
+
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      }).then(function(res){
+        if (res.ok) {
+          card.classList.add('sent');
+          successPanel.classList.add('show');
+        } else {
+          throw new Error('send failed');
+        }
+      }).catch(function(){
+        errorMsg.classList.add('show');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send message';
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
